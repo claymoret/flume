@@ -1,0 +1,220 @@
+commit 1248ffdcf57765e8786424ae0550ab1b50c8bd1b
+Author: Jarek Jarcec Cecho <jarcec@apache.org>
+Date:   Wed Nov 18 07:37:01 2015 -0800
+
+    FLUME-2841: Upgrade commons-collections to 3.2.2
+    
+    (Hari Shreedharan via Jarek Jarcec Cecho)
+    
+    Change-Id: If6cca667adae85a5a56d95995a639ddf1d821a89
+    (cherry picked from commit 041c380305c57586bb38ccd867442b69625b5d23)
+
+commit 2c8755dc92a106301e6b95cf18ae2dfee3d89f05
+Author: Jenkins <dev-kitchen@cloudera.com>
+Date:   Mon Nov 23 10:46:44 2015 -0800
+
+    Branch for CDH5.5.1
+
+commit 6874a35f9e390eee63b12d287d675cbd7aa18371
+Author: Jenkins <dev-kitchen@cloudera.com>
+Date:   Mon Oct 12 15:49:44 2015 -0700
+
+    Branch for CDH5.5.0
+
+commit 2f456c1da5e99d1bbf41cdf4c17e24f9a491543a
+Author: Jarek Jarcec Cecho <jarcec@apache.org>
+Date:   Wed Sep 30 09:34:31 2015 -0700
+
+    FLUME-2734: Kafka Channel timeout property is overridden by default value
+    
+    (Johny Rufus via Jarek Jarcec Cecho)
+
+commit 855ab6e163be6b6729b6ac0995afdb321bfd823f
+Author: Jarek Jarcec Cecho <jarcec@apache.org>
+Date:   Wed Sep 30 09:20:29 2015 -0700
+
+    FLUME-2751: Upgrade Derby version to 10.11.1.1
+    
+    (Johny Rufus via Jarek Jarcec Cecho)
+
+commit a64597ef9a24307a7b3a0d9d690b5073242a4287
+Author: Roshan Naik <roshan@hortonworks.com>
+Date:   Tue Sep 29 14:43:34 2015 -0700
+
+    FLUME-2804. Hive sink - abort remaining transactions on shutdown
+    
+     (Sriharsha Chintalapani via Roshan Naik)
+
+commit 044c5033cb73a26d1243fc280f3ca694ac6d8f85
+Author: Hari Shreedharan <hshreedharan@apache.org>
+Date:   Thu Sep 24 22:45:04 2015 -0700
+
+    FLUME-2773. TailDirSource throws FileNotFound Exception if ~/.flume directory is not created already
+    
+    (Johny Rufus via Hari)
+
+commit a017cdc83d4a625e5e10d788c05b8578caee111f
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Mon Sep 21 13:43:50 2015 -0700
+
+    FLUME-2095. JMS source with TIBCO
+    
+    (Michelle Casbon via Johny Rufus)
+
+commit 33275c554a8b64ffab0bbfce2e6ea9008b03808c
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Tue Sep 15 18:35:28 2015 -0700
+
+    FLUME-2672. NPE in KafkaSourceCounter
+    
+    (Rigo MacTaggart via Johny Rufus)
+
+commit 33d78201992f9c2cfd587f62030183714cf5ae07
+Author: Roshan Naik <roshan@hortonworks.com>
+Date:   Tue Aug 25 18:38:14 2015 -0700
+
+    FLUME-2754 - Hive Sink skipping first transaction in each Batch of Hive Transactions
+    
+    (Deepesh Khandelwal via Roshan Naik)
+
+commit a8f31c949010fc0842e80305eb4c07276fb5e216
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Thu Aug 20 08:11:13 2015 -0700
+
+    FLUME-2763. flume_env script should handle jvm parameters like -javaagent -agentpath -agentlib
+    
+    ( Philip Zeyliger, Neerja Khattar via Johny Rufus)
+
+commit 297e5617210dbc376cd0a589d89e66e7150c5d0d
+Author: Jenkins <dev-kitchen@cloudera.com>
+Date:   Fri Sep 4 13:53:31 2015 -0700
+
+    Branch for CDH5.5.x
+
+commit 0dbde12ecd28dbe4c497b197db5b7ddd7d39465a
+Author: Andrew Bayer <andrew@cloudera.com>
+Date:   Thu Sep 3 21:16:43 2015 -0700
+
+    CLOUDERA-BUILD - use cdh.spark.version
+
+commit 5fca338ee4f3066596ba4612b4d01a76f6d16f5a
+Author: Johny Rufus <jrufus@cloudera.com>
+Date:   Thu Aug 27 16:22:35 2015 -0700
+
+    CLOUDERA-BUILD. Tail Directory source related pom.xml changes
+
+commit 8ae19374460bacce2e334e196f1ea71feebb3c72
+Author: Roshan Naik <roshan@hortonworks.com>
+Date:   Mon Aug 17 19:34:03 2015 -0700
+
+    FLUME-2498.  Implement Taildir Source
+    
+    (Satoshi Iijima via Roshan Naik)
+
+commit c998d0c12e83b77b4320fb4f3bef791a840dbec8
+Author: Ashish <apaliwal@apache.org>
+Date:   Thu Aug 6 13:55:43 2015 -0700
+
+    FLUME-2753 Error when specifying empty replace string in Search and Replace Interceptor
+    
+    (Johny Rufus via Ashish Paliwal)
+
+commit 0541f737459f17e8aee09f5af1c7a67d2bec5435
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Wed Aug 5 07:55:51 2015 -0700
+
+    FLUME-2485. Thrift Source tests fail on Oracle JDK 8
+    
+    (Miroslav Holubec via Johny Rufus)
+
+commit e8301c7933f8fa9b66e8e097dc7156f077895ea6
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Wed Jul 29 15:02:33 2015 -0700
+
+    FLUME-2660. Add documentation for EventValidator. Fixed doc formatting issue
+    
+    (Ashish Paliwal via Johny Rufus)
+
+commit 22c25c9e0cbad3e77239035d187b06a55ed3f18c
+Author: Hari Shreedharan <hshreedharan@apache.org>
+Date:   Mon Jul 27 21:41:07 2015 -0700
+
+    FLUME-2749. Fix kerberos configuration error when using short names in multiple HDFS Sinks
+    
+    (Johny Rufus via Hari)
+
+commit ee827dfa6ea2ef0b29bcd49575c092fa73c9ce49
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Thu Jul 23 23:58:12 2015 -0700
+
+    FLUME-2660. Add documentation for EventValidator
+    
+    (Ashish Paliwal via Johny Rufus)
+
+commit a06797ed26842b90bfd5fc93a8d659d92c7f533e
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Mon Jul 13 18:01:10 2015 -0700
+
+    FLUME-2628. Add an optional parameter to specify the expected input text encoding for the netcat source
+    
+    (Lionel Herbet via Johny Rufus)
+
+commit 1324da41cd895950ab69eb2dfcd8ce0eea519558
+Author: Jarek Jarcec Cecho <jarcec@apache.org>
+Date:   Tue Jul 14 09:29:30 2015 -0700
+
+    FLUME-2737: Documentation for Pollable Source config parameters introduced in FLUME-2729
+    
+    (Ted Malaska via Jarek Jarcec Cecho)
+
+commit d795e76a90a4b943aea2fe29896a8f05866d7e28
+Author: Hari Shreedharan <hshreedharan@apache.org>
+Date:   Thu Jul 9 12:21:17 2015 -0700
+
+    FLUME-2738. Fix file descriptor leak in AsyncHBaseSink when HBase cluster goes down.
+    
+    (Johny Rufus via Hari)
+
+commit 05cf76f13cab47016ce24b70ca5c66c7546c5357
+Author: Hari Shreedharan <hshreedharan@apache.org>
+Date:   Tue Jul 7 21:44:01 2015 -0700
+
+    FLUME-2732. Make maximum tolerated failures before shutting down and recreating client in AsyncHbaseSink configurable
+    
+    (Johny Rufus via Hari)
+
+commit 2f528dcfc79daf4b6e4934eba0b72b1af8b85285
+Author: apaliwal <apaliwal@apache.org>
+Date:   Tue Jul 7 16:53:46 2015 -0700
+
+    Patch for FLUME-2713
+
+commit 2baa0b01b677881497695cd30d172830793e3ad7
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Mon Jul 6 16:19:41 2015 -0700
+
+    FLUME-2729. Allow pollableSource backoff times to be configurable
+    
+    (Ted Malaska via Johny Rufus)
+
+commit 2849e8b934dce080be6a4562af40d0cb0a7f91b7
+Author: Johny Rufus <johnyrufus@apache.org>
+Date:   Fri Jul 3 11:22:38 2015 -0700
+
+    FLUME-2575. FLUME-2548 brings SSLv2Hello back for Avro Sink, but UG says it is one of the protocols to exclude
+    
+        (Li Xiang via Johny Rufus)
+
+commit a4da45618b276e7e95de2f9a19f4c98375db20e1
+Author: Hari Shreedharan <hshreedharan@apache.org>
+Date:   Wed May 27 09:58:23 2015 -0700
+
+    FLUME-2215. ResettableFileInputStream can't support ucs-4 character
+    
+    (Alexandre Dutra via Hari)
+
+commit 411f723175c75d7b0d6774c9afeede0f0c39bf90
+Author: Johny Rufus <jrufus@cloudera.com>
+Date:   Wed Jul 22 11:57:30 2015 -0700
+
+    CLOUDERA-BUILD. Backports for CDH build
