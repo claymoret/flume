@@ -24,9 +24,7 @@ import static org.apache.flume.source.taildir.TaildirSourceConfigurationConstant
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.flume.Event;
@@ -36,8 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 
 public class TailFile {
   private static final Logger logger = LoggerFactory.getLogger(TailFile.class);
@@ -52,40 +48,65 @@ public class TailFile {
   private long lastUpdated;
   private boolean needTail;
   private final Map<String, String> headers;
+  private byte[] buffer;
+  private int bufferPos;
+  private int bufferLen;
+  private StringBuilder lineBuilder;
+  private long lineReadPos;
 
   public TailFile(File file, Map<String, String> headers, long inode, long pos)
       throws IOException {
     this.raf = new RandomAccessFile(file, "r");
-    if (pos > 0) raf.seek(pos);
+    if (pos > 0) {
+      raf.seek(pos);
+      lineReadPos = pos;
+    }
     this.path = file.getAbsolutePath();
     this.inode = inode;
     this.pos = pos;
     this.lastUpdated = 0L;
     this.needTail = true;
     this.headers = headers;
+    this.buffer = new byte[8192];
+    this.bufferPos = -1;
+    this.bufferLen = -1;
+    this.lineBuilder = null;
   }
 
   public RandomAccessFile getRaf() { return raf; }
   public String getPath() { return path; }
   public long getInode() { return inode; }
   public long getPos() { return pos; }
+  public long getLineReadPos() { return lineReadPos; }
   public long getLastUpdated() { return lastUpdated; }
   public boolean needTail() { return needTail; }
   public Map<String, String> getHeaders() { return headers; }
 
   public void setPath(String path) { this.path = path; }
   public void setPos(long pos) { this.pos = pos; }
+  public void setLineReadPos(long lineReadPos) {
+    logger.debug("Updated line read position from: " + this.lineReadPos + " to: " + lineReadPos);
+    this.lineReadPos = lineReadPos;
+  }
   public void setLastUpdated(long lastUpdated) { this.lastUpdated = lastUpdated; }
   public void setNeedTail(boolean needTail) { this.needTail = needTail; }
 
   public boolean updatePos(String path, long inode, long pos) throws IOException {
     if (this.inode == inode) {
-      raf.seek(pos);
+      updateFilePos(pos);
       setPos(pos);
       logger.info("Updated position, file: " + path + ", inode: " + inode + ", pos: " + pos);
       return true;
     }
     return false;
+  }
+
+  public void updateFilePos(long pos) throws IOException {
+    raf.seek(pos);
+    lineReadPos = pos;
+    bufferPos = -1;
+    bufferLen = -1;
+    lineBuilder = null;
   }
 
   public List<Event> readEvents(int numEvents, boolean backoffWithoutNL,
@@ -102,7 +123,7 @@ public class TailFile {
   }
 
   private Event readEvent(boolean backoffWithoutNL, boolean addByteOffset) throws IOException {
-    Long posTmp = raf.getFilePointer();
+    Long posTmp = getLineReadPos();
     String line = readLine();
     if (line == null) {
       return null;
@@ -110,7 +131,7 @@ public class TailFile {
     if (backoffWithoutNL && !line.endsWith(LINE_SEP)) {
       logger.info("Backing off in file without newline: "
           + path + ", inode: " + inode + ", pos: " + raf.getFilePointer());
-      raf.seek(posTmp);
+      updateFilePos(posTmp);
       return null;
     }
 
@@ -126,20 +147,42 @@ public class TailFile {
   }
 
   private String readLine() throws IOException {
-    ByteArrayDataOutput out = ByteStreams.newDataOutput(300);
-    int i = 0;
-    int c;
-    while ((c = raf.read()) != -1) {
-      i++;
-      out.write((byte) c);
-      if (c == LINE_SEP.charAt(0)) {
+    String line = null;
+    if (lineBuilder == null) {
+      lineBuilder = new StringBuilder(1024);
+    }
+    while (true) {
+      if (bufferPos == -1) {
+        if (raf.getFilePointer() < raf.length()) {
+          bufferLen = raf.read(buffer);
+          bufferPos = 0;
+        } else {
+          if (lineBuilder.length() > 0) {
+            line = lineBuilder.toString();
+            setLineReadPos(lineReadPos + line.length());
+            lineBuilder = null;
+          }
+          break;
+        }
+      }
+      for (; bufferPos < bufferLen;) {
+        lineBuilder.append((char)buffer[bufferPos]);
+        if (buffer[bufferPos++] == LINE_SEP.charAt(0)) {
+          line = lineBuilder.toString();
+          setLineReadPos(lineReadPos + line.length());
+          lineBuilder = null;
+          break;
+        }
+      }
+      if (bufferPos == bufferLen) {
+        bufferPos = -1;
+        bufferLen = -1;
+      }
+      if (line != null) {
         break;
       }
     }
-    if (i == 0) {
-      return null;
-    }
-    return new String(out.toByteArray(), Charsets.UTF_8);
+    return line;
   }
 
   public void close() {

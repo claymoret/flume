@@ -248,6 +248,7 @@ public class TaildirSource extends AbstractSource implements
     while (true) {
       reader.setCurrentFile(tf);
       List<Event> events = reader.readEvents(batchSize, backoffWithoutNL);
+      logger.debug("position after readEvents: " + tf.getLineReadPos());
       if (events.isEmpty()) {
         break;
       }
@@ -256,6 +257,7 @@ public class TaildirSource extends AbstractSource implements
       try {
         getChannelProcessor().processEventBatch(events);
         reader.commit();
+        logger.debug("position after commit: " + tf.getPos());
       } catch (ChannelException ex) {
         logger.warn("The channel is full or unexpected failure. " +
           "The source will try again after " + retryInterval + " ms");
