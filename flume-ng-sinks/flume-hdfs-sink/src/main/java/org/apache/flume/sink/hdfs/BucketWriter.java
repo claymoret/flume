@@ -110,6 +110,7 @@ class BucketWriter {
   private Clock clock = new SystemClock();
   private final long retryInterval;
   private final int maxRenameTries;
+  private final int maxCloseTries;
 
   // flag that the bucket writer was closed due to idling and thus shouldn't be
   // reopened. Not ideal, but avoids internals of owners
@@ -149,6 +150,11 @@ class BucketWriter {
 
     this.retryInterval = retryInterval;
     this.maxRenameTries = maxCloseTries;
+    if (maxCloseTries < 1 || maxCloseTries > 100) {
+      this.maxCloseTries = 5;
+    } else {
+      this.maxCloseTries = maxCloseTries;
+    }
     isOpen = false;
     isUnderReplicated = false;
     this.writer.configure(context);
@@ -359,19 +365,33 @@ class BucketWriter {
     } catch (IOException e) {
       LOG.warn("pre-close flush failed", e);
     }
-    boolean failedToClose = false;
+    boolean failedToClose = true;
     LOG.info("Closing {}", bucketPath);
     CallRunner<Void> closeCallRunner = createCloseCallRunner();
     if (isOpen) {
-      try {
-        callWithTimeout(closeCallRunner);
-        sinkCounter.incrementConnectionClosedCount();
-      } catch (IOException e) {
+      int closeTries = 0;
+      while (closeTries < maxCloseTries && failedToClose) {
+        try {
+          callWithTimeout(closeCallRunner);
+          sinkCounter.incrementConnectionClosedCount();
+          failedToClose = false;
+        } catch (IOException e) {
+          LOG.warn(
+                  "failed to close() HDFSWriter for file (" + bucketPath +
+                          "). Exception follows.", e);
+          sinkCounter.incrementConnectionFailedCount();
+          failedToClose = true;
+        }
+        closeTries++;
+      }
+      if (failedToClose) {
         LOG.warn(
-          "failed to close() HDFSWriter for file (" + bucketPath +
-            "). Exception follows.", e);
-        sinkCounter.incrementConnectionFailedCount();
-        failedToClose = true;
+                "failed to close() HDFSWriter for file (" + bucketPath +
+                        ") after {} tries", maxCloseTries);
+      } else {
+        LOG.info(
+                "close() HDFSWriter for file (" + bucketPath +
+                        ") successfully after {} tries", closeTries);
       }
       isOpen = false;
     } else {
