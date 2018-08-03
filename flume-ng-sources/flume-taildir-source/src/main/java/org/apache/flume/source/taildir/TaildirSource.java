@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.apache.flume.ChannelException;
 import org.apache.flume.Context;
@@ -83,6 +84,9 @@ public class TaildirSource extends AbstractSource implements
   private List<Long> idleInodes = new CopyOnWriteArrayList<Long>();
   private Long backoffSleepIncrement;
   private Long maxBackOffSleepInterval;
+
+  private String renamePattern;
+  private String renameSuffix;
 
   @Override
   public synchronized void start() {
@@ -171,6 +175,9 @@ public class TaildirSource extends AbstractSource implements
             , PollableSourceConstants.DEFAULT_BACKOFF_SLEEP_INCREMENT);
     maxBackOffSleepInterval = context.getLong(PollableSourceConstants.MAX_BACKOFF_SLEEP
             , PollableSourceConstants.DEFAULT_MAX_BACKOFF_SLEEP);
+
+    renamePattern = context.getString(RENAME_PATTERN);
+    renameSuffix = context.getString(RENAME_SUFFIX, DEFAULT_RENAME_SUFFIX);
 
     if (sourceCounter == null) {
       sourceCounter = new SourceCounter(getName());
@@ -266,13 +273,54 @@ public class TaildirSource extends AbstractSource implements
     }
   }
 
+
+  private boolean markCompletion(String pathname) throws IOException {
+    if(pathname == null){
+      logger.error("Path is null.");
+      return false;
+    }else if(renamePattern == null){
+      logger.error("rename pattern is null");
+      return false;
+    }
+    if (pathname.isEmpty()  || renamePattern.isEmpty()) {
+      return false;
+    }
+    Pattern pattern = Pattern.compile(renamePattern);
+    if (!pattern.matcher(pathname).matches()) {
+      return false;
+    }
+    File src = new File(pathname);
+    File dest = new File(pathname + renameSuffix);
+    boolean renamed = false;
+    try {
+      renamed = src.renameTo(dest);
+    } catch (Throwable t) {
+      logger.error("Rename error", t);
+    }
+    if (renamed) {
+      logger.info("Successfully rename file {} to {}", src, dest);
+    } else {
+      logger.error("Failed to rename file {} to {}", src, dest);
+    }
+    return renamed;
+  }
+
   private void closeTailFiles() throws IOException, InterruptedException {
     for (long inode : idleInodes) {
       TailFile tf = reader.getTailFiles().get(inode);
-      if (tf.getRaf() != null) { // when file has not closed yet
-        tailFileProcess(tf, false);
-        tf.close();
-        logger.info("Closed file: " + tf.getPath() + ", inode: " + inode + ", pos: " + tf.getPos());
+      if (tf != null) {
+        if (tf.getRaf() != null) { // when file has not closed yet
+          tailFileProcess(tf, false);
+          tf.close();
+          logger.info("Closed file: " + tf.getPath() + ", inode: " + inode + ", pos: " + tf.getPos());
+          boolean completed = markCompletion(tf.getPath());
+          if (completed) {
+            existingInodes.remove(inode);
+            reader.getTailFiles().remove(inode);
+          }
+        }
+      } else {
+        logger.error("Unable to close inode {}: not found in tailFiles", inode);
       }
     }
     idleInodes.clear();

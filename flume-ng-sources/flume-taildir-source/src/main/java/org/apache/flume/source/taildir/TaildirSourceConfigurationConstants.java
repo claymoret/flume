@@ -49,4 +49,9 @@ public class TaildirSourceConfigurationConstants {
   public static final String BYTE_OFFSET_HEADER = "byteOffsetHeader";
   public static final String BYTE_OFFSET_HEADER_KEY = "byteoffset";
   public static final boolean DEFAULT_BYTE_OFFSET_HEADER = false;
+
+  /** Rename file to mark completion */
+  public static final String RENAME_PATTERN = "renamePattern";
+  public static final String RENAME_SUFFIX = "renameSuffix";
+  public static final String DEFAULT_RENAME_SUFFIX = ".COMPLETED";
 }
